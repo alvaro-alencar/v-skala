@@ -2,6 +2,7 @@ import datetime
 import random
 from collections import defaultdict
 
+# A função parse_form_data permanece inalterada
 def parse_form_data(form):
     config = {'grupos': {}, 'locais': {}, 'rodizios': []}
     
@@ -41,10 +42,33 @@ def parse_form_data(form):
             
     return config
 
-def gerar_escala_completa(config, feriados_obj):
+# A função gerar_escala_completa é a que vamos modificar
+def gerar_escala_completa(config, feriados_obj, data_inicio_geral, data_fim_geral):
+    """
+    Atualizado para lidar com o caso de nenhum rodízio ser especificado.
+    """
     escala_final_agrupada = {}
     relatorio_final_agrupado = defaultdict(lambda: defaultdict(int))
 
+    # --- LÓGICA DE INTELIGÊNCIA ADICIONADA AQUI ---
+    # Verifica se o gestor cadastrou algum período de rodízio.
+    if not config['rodizios']:
+        # Se não cadastrou, criamos um "rodízio padrão" usando todos os dados.
+        todos_grupos = list(config['grupos'].keys())
+        todos_locais = list(config['locais'].keys())
+        
+        # Só prossegue se houver pelo menos um grupo e um local cadastrado
+        if todos_grupos and todos_locais:
+            config['rodizios'].append({
+                'inicio': data_inicio_geral,
+                'fim': data_fim_geral,
+                'grupos': todos_grupos,
+                'locais': todos_locais
+            })
+    # -------------------------------------------------
+
+    # O resto da lógica continua a mesma, operando sobre a lista de rodízios
+    # (seja a que o usuário criou, ou a nossa padrão).
     alunos_por_grupo = {}
     aluno_id_global = 1
     for nome_grupo, info_grupo in config['grupos'].items():
@@ -54,20 +78,16 @@ def gerar_escala_completa(config, feriados_obj):
             aluno_id_global += 1
 
     for rodizio in config['rodizios']:
-        # --- MUDANÇA DE ROBUSTEZ AQUI ---
-        # Filtra os alunos e locais de forma segura, verificando se a chave existe
-        # antes de tentar usá-la. Isso evita o KeyError.
         alunos_do_periodo = []
         for nome_grupo in rodizio['grupos']:
-            if nome_grupo in alunos_por_grupo: # Checagem de segurança
+            if nome_grupo in alunos_por_grupo:
                 alunos_do_periodo.extend(alunos_por_grupo[nome_grupo])
 
         locais_do_periodo = []
         for nome_local in rodizio['locais']:
-            if nome_local in config['locais']: # Checagem de segurança
+            if nome_local in config['locais']:
                 locais_do_periodo.append({'nome': nome_local, **config['locais'][nome_local]})
         
-        # Se não houver alunos ou locais válidos para este período, pula para o próximo
         if not alunos_do_periodo or not locais_do_periodo:
             continue
 
@@ -83,7 +103,7 @@ def gerar_escala_completa(config, feriados_obj):
     return escala_final_agrupada, relatorio_final_agrupado, todos_alunos
 
 
-# As funções abaixo permanecem inalteradas
+# As outras funções (gerar_vagas_de_plantao, criar_escala_justa) permanecem inalteradas
 def gerar_vagas_de_plantao(data_inicio, data_fim, locais, feriados_obj):
     vagas_a_preencher = []
     data_atual = data_inicio

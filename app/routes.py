@@ -8,27 +8,30 @@ import io
 import csv
 from app.services import scheduler_service
 
-# 1. Criamos o Blueprint. 'main' é o nome que damos a este conjunto de rotas.
 main = Blueprint('main', __name__)
 
-# 2. Usamos o decorador do blueprint para registrar as rotas
 @main.route('/')
 def index():
-    """Rota principal, renderiza o formulário."""
     return render_template('index.html')
 
 @main.route('/gerar_escala', methods=['GET', 'POST'])
 def gerar_escala():
-    """
-    Recebe os dados do formulário, gera a escala e salva os dados na sessão.
-    """
     if request.method == 'POST':
         form_data = request.form
         session['form_data'] = dict(form_data)
 
+        # Pegamos as datas gerais aqui
+        data_inicio_geral = datetime.date.fromisoformat(form_data['data_inicio'])
+        data_fim_geral = datetime.date.fromisoformat(form_data['data_fim'])
+
         config = scheduler_service.parse_form_data(form_data)
         feriados_obj = holidays.country_holidays('BR', subdiv='MG')
-        escala_bruta, relatorio, todos_alunos = scheduler_service.gerar_escala_completa(config, feriados_obj)
+        
+        # E passamos as datas para a função principal
+        escala_bruta, relatorio, todos_alunos = scheduler_service.gerar_escala_completa(
+            config, feriados_obj, data_inicio_geral, data_fim_geral
+        )
+        
         escala_ordenada = sorted(escala_bruta.items())
         
         return render_template('resultado.html', 
@@ -36,20 +39,25 @@ def gerar_escala():
                                relatorio=relatorio,
                                alunos_ordenados=sorted(todos_alunos))
     
-    return redirect(url_for('main.index')) # Note que agora usamos 'main.index'
+    return redirect(url_for('main.index'))
 
 @main.route('/exportar')
 def exportar_csv():
-    """
-    Nova rota para gerar e baixar a escala em formato CSV.
-    """
     form_data = session.get('form_data')
     if not form_data:
         return redirect(url_for('main.index'))
 
+    # Também pegamos as datas aqui para a exportação
+    data_inicio_geral = datetime.date.fromisoformat(form_data['data_inicio'])
+    data_fim_geral = datetime.date.fromisoformat(form_data['data_fim'])
+
     config = scheduler_service.parse_form_data(form_data)
     feriados_obj = holidays.country_holidays('BR', subdiv='MG')
-    escala_bruta, _, _ = scheduler_service.gerar_escala_completa(config, feriados_obj)
+    
+    # E passamos para a função principal na exportação também
+    escala_bruta, _, _ = scheduler_service.gerar_escala_completa(
+        config, feriados_obj, data_inicio_geral, data_fim_geral
+    )
 
     output = io.StringIO()
     writer = csv.writer(output, delimiter=';')
