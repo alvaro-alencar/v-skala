@@ -1,0 +1,13 @@
+# Ambiente Virtual
+.venv/
+venv/
+
+# Arquivos temporários do Python
+__pycache__/
+*.pyc
+
+# Arquivos do VSCode (opcional, mas recomendado)
+.vscode/
+
+# Arquivos de sistema
+.DS_Store

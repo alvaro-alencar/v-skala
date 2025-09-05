@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Escala Gerada{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1>Escala de Plantões Gerada</h1>
+        <p class="lead">A escala abaixo foi distribuída de forma a equilibrar os tipos de plantão entre todos os acadêmicos.</p>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-header">
+            <h5>Escala Completa</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Data</th>
+                            <th scope="col">Turno</th>
+                            <th scope="col">Local</th>
+                            <th scope="col">Vagas Preenchidas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for (data, turno, local), vagas in escala %}
+                        <tr>
+                            <td>{{ data.strftime('%d/%m/%Y (%a)') }}</td>
+                            <td>{{ turno }}</td>
+                            <td><strong>{{ local }}</strong></td>
+                            <td>
+                                {% for tipo, academicos in vagas.items() %}
+                                    <span class="badge bg-secondary me-1">{{ tipo }}:</span>
+                                    {% for academico in academicos %}
+                                        <span class="badge bg-primary me-2">{{ academico }}</span>
+                                    {% endfor %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">Nenhuma escala para exibir com os parâmetros fornecidos.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5>Relatório de Distribuição por Acadêmico</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for academico in alunos_ordenados %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <strong>{{ academico }}</strong>
+                            <span class="badge bg-dark rounded-pill">
+                                Total: {{ relatorio[academico].values() | sum }}
+                            </span>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            {% for categoria, contagem in relatorio[academico].items()|sort %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center small">
+                                    {{ categoria.replace('_', ' ') }}
+                                    <span class="badge bg-info rounded-pill">{{ contagem }}</span>
+                                </li>
+                            {% else %}
+                                <li class="list-group-item">Nenhum plantão alocado.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">← Voltar e Gerar Nova Escala</a>
+    </div>
+</div>
+{% endblock %}

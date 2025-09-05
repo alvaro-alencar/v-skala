@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Configuração da Escala{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 960px;">
+    <div class="text-center mb-5">
+        <h1>Configuração da Escala</h1>
+        <p class="lead">Defina os grupos, locais e regras para gerar uma escala precisa e justa.</p>
+    </div>
+
+    <form action="{{ url_for('gerar_escala') }}" method="post">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5>1. Período Geral da Escala</h5>
+            </div>
+            <div class="card-body row">
+                <div class="col-md-6 mb-3">
+                    <label for="data_inicio" class="form-label">Data de Início:</label>
+                    <input type="date" class="form-control" id="data_inicio" name="data_inicio" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="data_fim" class="form-label">Data de Fim:</label>
+                    <input type="date" class="form-control" id="data_fim" name="data_fim" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5>2. Grupos de Alunos</h5>
+            </div>
+            <div class="card-body" id="grupos-container">
+                </div>
+            <div class="card-footer text-end">
+                <button type="button" class="btn btn-success btn-sm" onclick="adicionarGrupo()">+ Adicionar Grupo</button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5>3. Locais e Regras de Plantão</h5>
+            </div>
+            <div class="card-body" id="locais-container">
+                </div>
+            <div class="card-footer text-end">
+                <button type="button" class="btn btn-success btn-sm" onclick="adicionarLocal()">+ Adicionar Local</button>
+            </div>
+        </div>
+        
+        <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Gerar Escala Completa</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/dynamic_forms.js') }}"></script>
+{% endblock %}
