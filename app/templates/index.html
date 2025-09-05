@@ -8,37 +8,20 @@
         <h1>Configuração da Escala</h1>
         <p class="lead">Defina os grupos, locais e o cronograma de rodízio para gerar a escala.</p>
     </div>
-
-    <form action="{{ url_for('gerar_escala') }}" method="post">
+    <form action="{{ url_for('main.gerar_escala') }}" method="post">
         <div class="card shadow-sm mb-4">
             <div class="card-header"><h5>1. Período Geral da Escala</h5></div>
-            <div class="card-body row">
-                <div class="col-md-6 mb-3"><label for="data_inicio" class="form-label">Data de Início:</label><input type="date" class="form-control" id="data_inicio" name="data_inicio" required></div>
-                <div class="col-md-6 mb-3"><label for="data_fim" class="form-label">Data de Fim:</label><input type="date" class="form-control" id="data_fim" name="data_fim" required></div>
-            </div>
+            <div class="card-body row"><div class="col-md-6 mb-3"><label for="data_inicio" class="form-label">Data de Início:</label><input type="date" class="form-control" id="data_inicio" name="data_inicio" required></div><div class="col-md-6 mb-3"><label for="data_fim" class="form-label">Data de Fim:</label><input type="date" class="form-control" id="data_fim" name="data_fim" required></div></div>
         </div>
-
         <div class="card shadow-sm mb-4">
-            <div class="card-header"><h5>2. Grupos de Alunos</h5></div>
-            <div class="card-body" id="grupos-container"></div>
-            <div class="card-footer text-end"><button type="button" class="btn btn-success btn-sm" onclick="adicionarGrupo()">+ Adicionar Grupo</button></div>
+            <div class="card-header"><h5>2. Grupos de Alunos</h5></div><div class="card-body" id="grupos-container"></div><div class="card-footer text-end"><button type="button" class="btn btn-success btn-sm" onclick="adicionarGrupo()">+ Adicionar Grupo</button></div>
         </div>
-
         <div class="card shadow-sm mb-4">
-            <div class="card-header"><h5>3. Locais e Regras de Plantão</h5></div>
-            <div class="card-body" id="locais-container"></div>
-            <div class="card-footer text-end"><button type="button" class="btn btn-success btn-sm" onclick="adicionarLocal()">+ Adicionar Local</button></div>
+            <div class="card-header"><h5>3. Locais e Regras de Plantão</h5></div><div class="card-body" id="locais-container"></div><div class="card-footer text-end"><button type="button" class="btn btn-success btn-sm" onclick="adicionarLocal()">+ Adicionar Local</button></div>
         </div>
-
         <div class="card shadow-sm mb-4">
-            <div class="card-header">
-                <h5>4. Cronograma de Rodízio</h5>
-                <small class="text-muted">Associe grupos a locais para períodos de tempo específicos.</small>
-            </div>
-            <div class="card-body" id="rodizio-container"></div>
-            <div class="card-footer text-end"><button type="button" class="btn btn-info btn-sm" onclick="adicionarRodizio()">+ Adicionar Período de Rodízio</button></div>
+            <div class="card-header"><h5>4. Cronograma de Rodízio</h5><small class="text-muted">Associe grupos a locais para períodos de tempo específicos.</small></div><div class="card-body" id="rodizio-container"></div><div class="card-footer text-end"><button type="button" class="btn btn-info btn-sm" onclick="adicionarRodizio()">+ Adicionar Período de Rodízio</button></div>
         </div>
-        
         <div class="d-grid gap-2 mt-4"><button type="submit" class="btn btn-primary btn-lg">Gerar Escala Completa</button></div>
     </form>
 </div>
