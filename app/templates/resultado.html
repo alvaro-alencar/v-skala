@@ -4,18 +4,29 @@
 
 {% block content %}
 <div class="container my-5">
-    <div class="text-center mb-5">
-        <h1>Escala de Plantões Gerada</h1>
-        <p class="lead">A escala abaixo foi distribuída de forma a equilibrar os tipos de plantão entre todos os acadêmicos.</p>
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div class="text-start">
+            <h1>Escala de Plantões Gerada</h1>
+            <p class="lead">A escala abaixo foi distribuída de forma a equilibrar os tipos de plantão.</p>
+        </div>
+        <div class="text-end">
+            <a href="{{ url_for('exportar_csv') }}" class="btn btn-lg btn-success">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-download me-2" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+                Exportar para CSV
+            </a>
+        </div>
     </div>
-
+    
     <div class="card shadow-sm mb-5">
         <div class="card-header">
             <h5>Escala Completa</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover table-bordered">
                     <thead>
                         <tr>
                             <th scope="col">Data</th>
@@ -31,10 +42,17 @@
                             <td>{{ turno }}</td>
                             <td><strong>{{ local }}</strong></td>
                             <td>
+                                {% set cor_local = 'bg-primary' %} {# Define uma cor padrão #}
+                                {% if 'samu' in local.lower() %}
+                                    {% set cor_local = 'bg-danger' %}
+                                {% elif 'pronto socorro' in local.lower() or 'ps' in local.lower() %}
+                                    {% set cor_local = 'bg-info text-dark' %}
+                                {% endif %}
                                 {% for tipo, academicos in vagas.items() %}
                                     <span class="badge bg-secondary me-1">{{ tipo }}:</span>
                                     {% for academico in academicos %}
-                                        <span class="badge bg-primary me-2">{{ academico }}</span>
+                                        {# Usamos a variável 'cor_local' para definir a classe da cor #}
+                                        <span class="badge {{ cor_local }} me-2">{{ academico }}</span>
                                     {% endfor %}
                                 {% endfor %}
                             </td>
@@ -62,11 +80,11 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <strong>{{ academico }}</strong>
                             <span class="badge bg-dark rounded-pill">
-                                Total: {{ relatorio[academico].values() | sum }}
+                                Total: {{ relatorio.get(academico, {}).values() | sum }}
                             </span>
                         </div>
                         <ul class="list-group list-group-flush">
-                            {% for categoria, contagem in relatorio[academico].items()|sort %}
+                            {% for categoria, contagem in relatorio.get(academico, {}).items()|sort %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center small">
                                     {{ categoria.replace('_', ' ') }}
                                     <span class="badge bg-info rounded-pill">{{ contagem }}</span>
